@@ -92,16 +92,13 @@ namespace Pretzel.Logic.Commands
 
         private void WriteSubset(TextWriter writer, string[] args)
         {
-            var textWriter = new StringWriter();
-            Settings.WriteOptionDescriptions(textWriter);
-            var output = textWriter.ToString();
-
-            foreach (var line in output.Split(new[] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries))
+            using (var textWriter = new StringWriter())
             {
-                if (args.Any(line.Contains))
-                {
-                    writer.WriteLine(line);
-                }
+                Settings.WriteOptionDescriptions(textWriter);
+                var output = textWriter.ToString();
+                foreach (var line in output.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries))
+                    if (args.Any(line.Contains))
+                        writer.WriteLine(line);
             }
         }
     }

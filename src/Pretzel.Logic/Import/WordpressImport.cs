@@ -5,6 +5,7 @@ using System.IO.Abstractions;
 using System.Xml.Linq;
 using Pretzel.Logic.Extensions;
 using System.IO;
+using System.Diagnostics;
 
 namespace Pretzel.Logic.Import
 {
@@ -28,8 +29,9 @@ namespace Pretzel.Logic.Import
 
             XNamespace wp = "http://wordpress.org/export/1.1/";
             XNamespace content = "http://purl.org/rss/1.0/modules/content/";
-
-            var posts = from e in root.Descendants("item")
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
+            var posts = from e in root.Descendants("item").AsParallel()
                         select new WordpressPost
                         {
                             Title = e.Element("title").Value,
@@ -43,11 +45,14 @@ namespace Pretzel.Logic.Import
                                          where t.Attribute("domain").Value == "category"
                                          select t.Value
                         };
-
+            Console.WriteLine("Found {0} items to import in {1}ms", posts.Count(), stopWatch.ElapsedMilliseconds);
+            stopWatch = new Stopwatch();
+            stopWatch.Start();
             foreach (var p in posts)
             {
                 ImportPost(p);
             }
+            Console.WriteLine("wrote {0} items in {1}ms", posts.Count(), stopWatch.ElapsedMilliseconds);
         }
 
         private void ImportPost(WordpressPost p)

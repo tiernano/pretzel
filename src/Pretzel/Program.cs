@@ -71,6 +71,7 @@ namespace Pretzel
         [Conditional("DEBUG")]
         public void WaitForClose()
         {
+	    Console.WriteLine("Press enter to kill");
             Console.ReadLine();
         }
 
